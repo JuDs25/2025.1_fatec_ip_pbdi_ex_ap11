@@ -151,3 +151,29 @@ BEGIN
 END;
 $$;
 
+-- 1.3 Reescreva o exercício 1.2 de modo que o total de pedidos seja armazenado em uma variável de saída (OUT)
+DROP PROCEDURE IF EXISTS sp_contar_pedidos_cliente;
+
+CREATE OR REPLACE PROCEDURE sp_contar_pedidos_cliente(
+  IN p_cod_cliente INT,
+  OUT p_total_pedidos INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  SELECT COUNT(*)
+  INTO p_total_pedidos
+  FROM tb_pedido
+  WHERE cod_cliente = p_cod_cliente;
+END;
+$$;
+
+-- Bloquinho anônimo para teste
+DO $$
+DECLARE
+  v_total INT;
+BEGIN
+  CALL sp_contar_pedidos_cliente(1, v_total);
+  RAISE NOTICE 'O cliente possui % pedidos.', v_total;
+END;
+$$;
