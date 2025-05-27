@@ -205,3 +205,50 @@ BEGIN
   RAISE NOTICE 'Total de pedidos: %', v_total;
 END;
 $$;
+
+-- 1.5 Adicione um procedimento ao sistema do restaurante. Ele deve
+-- - Receber um parâmetro VARIADIC contendo nomes de pessoas
+-- - Fazer uma inserção na tabela de clientes para cada nome recebido
+-- - Receber um parâmetro de saída que contém o seguinte texto:
+-- “Os clientes: Pedro, Ana, João etc foram cadastrados”
+-- Evidentemente, o resultado deve conter os nomes que de fato foram enviados por meio do
+-- parâmetro VARIADIC.
+
+CREATE OR REPLACE PROCEDURE sp_cadastrar_varios_clientes(
+  OUT p_mensagem TEXT,
+  VARIADIC p_nomes VARCHAR[]
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_nome VARCHAR;
+  v_lista_nomes TEXT := '';
+BEGIN
+  FOREACH v_nome IN ARRAY p_nomes
+  LOOP
+    INSERT INTO tb_cliente (nome) VALUES (v_nome);
+
+    -- Vai concatenando os nomes na string
+    IF v_lista_nomes = '' THEN
+      v_lista_nomes := v_nome;
+    ELSE
+      v_lista_nomes := v_lista_nomes || ', ' || v_nome;
+    END IF;
+  END LOOP;
+
+  -- Monta a mensagem final
+  p_mensagem := 'Os clientes: ' || v_lista_nomes || ' foram cadastrados.';
+END;
+$$;
+
+-- Bloquinho anônimo para teste
+
+DO $$
+DECLARE
+  v_msg TEXT;
+BEGIN
+  CALL sp_cadastrar_varios_clientes(v_msg, 'Pedro', 'Ana', 'João');
+  RAISE NOTICE '%', v_msg;
+END;
+$$;
+
