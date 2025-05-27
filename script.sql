@@ -123,4 +123,31 @@ $$;
 -- Testando o Log
 SELECT * FROM tb_log;
 
+-- 1.2 Adicione um procedimento ao sistema do restaurante. Ele deve
+-- - receber um parâmetro de entrada (IN) que representa o código de um cliente
+-- - exibir, com RAISE NOTICE, o total de pedidos que o cliente tem
+
+CREATE OR REPLACE PROCEDURE sp_contar_pedidos_cliente(
+  IN p_cod_cliente INT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  v_total_pedidos INT;
+BEGIN
+  SELECT COUNT(*) 
+  INTO v_total_pedidos
+  FROM tb_pedido
+  WHERE cod_cliente = p_cod_cliente;
+
+  RAISE NOTICE 'O cliente possui % pedidos.', v_total_pedidos;
+END;
+$$;
+
+-- Bloquinho anônimo para teste
+DO $$
+BEGIN
+  CALL sp_contar_pedidos_cliente(1);
+END;
+$$;
 
