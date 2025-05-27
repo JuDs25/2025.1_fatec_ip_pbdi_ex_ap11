@@ -252,3 +252,4 @@ BEGIN
 END;
 $$;
 
+-- Já crie um bloquinho anônimo para cada etapa dos exercícios, sendo assim, finalizei o ex 1.6
